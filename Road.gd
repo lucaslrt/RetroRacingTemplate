@@ -1,6 +1,5 @@
 extends Node2D
 
-
 var screen_width = 1024
 var screen_height = 680
 
@@ -23,7 +22,6 @@ var road
 var border
 var divid_line
 var pos = 0
-#var num
 var skyline
 var skln_pos = 0
 var skln_height = 0
@@ -31,8 +29,6 @@ var playerX = 0
 var speedX = .7
 
 func _ready():
-#	step = 1/60
-#	print((1/60) * 1.5)
 	top_speed = float(seg) / step * 1.5
 	acceleration = float(top_speed) / 4
 	breaking = -top_speed
@@ -40,8 +36,8 @@ func _ready():
 	cam = 1 / tan((field_of_view / 2) * PI / 180)
 	
 	# Drawing Road
-	print("Criando pista...")
-	for i in range(track_size):#1600 = Quantity of horizontal lines on the road
+#	print("Criando pista...")
+	for i in range(track_size):# Quantity of horizontal lines on the road
 		lines.push_back({x = 0, y = 0, z = 0, X = 0, Y = 0, W = 0, scale = 0, curve = 0, sprite = null, spriteX = 0, clip = 0.0})
 		lines[i].z = i * seg
 		if i != 0 and track_size % i == 0:
@@ -58,20 +54,12 @@ func _ready():
 			lines[i].y = sin(i / 30.0 - 25) * 1500
 		if i > 1200: #Right curve
 			lines[i].curve = 0.2
-#	for i in range(track_size-1, -1, -1):
-#		add_child(lines[i].sprite)
-	
-	
+
 	track_size = lines.size()
-#	num = lines.size()
 	set_process(true)
 	pass
 
 func line(segment, cam_x, cam_y, cam_z):
-#	if ((cur_line.z) - cam_z) != 0:
-#		cur_line.scale = (cam/ (cur_line.z - cam_z)) 
-#	else:
-#		cur_line.scale = cam / 1
 	if ((segment.z) - cam_z) != 0:
 		segment.scale = abs(cam / (segment.z - cam_z)) 
 	segment.X = (1 + segment.scale * (segment.x - cam_x)) * screen_width/ 2
@@ -105,29 +93,15 @@ func _draw_sprite(line):
 		
 		if clipH >= destH:
 			line.sprite.hide()
-	#		print("escondendo...")
 			return
 		
 		#Setar as configurações de sprite aqui
 		line.sprite.scale = Vector2(destW/w, destH/h)
 		line.sprite.position = Vector2(destX, destY)
 		line.sprite.show()
-#	add_child(sprite)
-#	print("Desenhando sprite na posição: ", line.sprite.position)
 	pass
 
 func _draw():
-	
-#	var start_point = pos / seg
-#	var cam_h = 1500 + lines[start_point].y #1500 = angle
-#	var cutoff = screen_height
-#	var x = 0
-#	var dx = 0
-	
-#	skln_pos += lines[start_point].curve * 2.0
-#	skln_height = -lines[start_point].y * 0.005
-#	skyline.set_region_rect(Rect2(skln_pos, skln_height, 1920, 320))
-#	var dir = lines[start_point].curve
 	var result = pos + (speed * step)#200
 
 	if result == 320000:#320000:
@@ -148,9 +122,9 @@ func _draw():
 	var x = 0
 	var dx = 0
 	playerX -= lines[start_point].curve * speed/top_speed * step
-	print("current curve = ", lines[start_point].curve)
-	print("playerX = ", playerX)
-	print("speed = ", speed)
+#	print("current curve = ", lines[start_point].curve)
+#	print("playerX = ", playerX)
+#	print("speed = ", speed)
 	
 	for n in range(start_point, start_point + render_seg_num): #400 = field of view (quantidade de segmentos carregados)
 		var num_pos = 0.0	
@@ -163,17 +137,11 @@ func _draw():
 		x += dx
 		dx += l.curve
 		l.clip = cutoff
-#		playerX += dx
-#		playerdX += l.curve
-#		if abs(playerdX - dx) >= 0.8:
-#			continue
 
 		if l.Y >= cutoff:
 			continue
-		
-		cutoff = l.Y
 
-#		print("fmod((n/3), 2) = ", fmod((n/3), 2))
+		cutoff = l.Y
 
 		# changing colors by position on screen
 		if fmod((n/3), 2):
@@ -195,34 +163,24 @@ func _draw():
 		drawRoad(road, p.X, p.Y, p.W, l.X, l.Y, l.W)
 		drawRoad(divid_line, p.X, p.Y, p.W * 0.01, l.X, l.Y, l.W * 0.01)
 	
-#	start_point = float(pos) / seg
 	for n in range(start_point + render_seg_num, start_point, -1):
-#		print("n = ", n)
-#	for n in range(start_point, start_point + render_seg_num):
 		_draw_sprite(lines[fmod(n, track_size)])
 	pass
 
 func _physics_process(delta):
-	
-
 	if Input.is_action_pressed("ui_up"):
-#		print("Acelerando...")
 		speed = speed + (acceleration * delta)
 	elif Input.is_action_pressed("ui_down"):
-#		print("Freiando...")
 		speed = speed + (breaking * delta)
 	else:
 		if speed > 0:
 			speed = speed + (decel * delta) 
-#			speed += 0.1
 	speed = clamp(speed, 0, top_speed)
 	
 	if Input.is_action_pressed("ui_left"):
 		playerX -= speedX * step
-#		playerdX -= 0.7
 	elif Input.is_action_pressed("ui_right"):
 		playerX += speedX * step
-#		playerdX += 0.7
 		
 	update()
 	pass
