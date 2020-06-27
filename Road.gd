@@ -1,11 +1,11 @@
 extends Node2D
 
-var screen_width = 1024
-var screen_height = 680
+var screen_width = ProjectSettings.get_setting("display/window/size/width")#1024
+var screen_height = ProjectSettings.get_setting("display/window/size/height")#680
 
 var road_width = 2000
-var seg = 200 #Velocity (smaller number = faster)
-var track_size = 1600 # Number of road segments
+var seg = 200
+var track_size = 2600 # Number of road segments
 var render_seg_num = 300
 
 var speed = 200
@@ -29,7 +29,7 @@ var playerX = 0
 var speedX = .7
 
 func _ready():
-	top_speed = float(seg) / step * 1.5
+	top_speed = float(seg) / step * 2
 	acceleration = float(top_speed) / 4
 	breaking = -top_speed
 	decel = float(-top_speed) / 5
@@ -37,6 +37,7 @@ func _ready():
 	
 	# Drawing Road
 #	print("Criando pista...")
+	var last_y = 0
 	for i in range(track_size):# Quantity of horizontal lines on the road
 		lines.push_back({x = 0, y = 0, z = 0, X = 0, Y = 0, W = 0, scale = 0, curve = 0, sprite = null, spriteX = 0, clip = 0.0})
 		lines[i].z = i * seg
@@ -47,17 +48,36 @@ func _ready():
 			$YSort.add_child(lines[i].sprite)
 		lines[i].spriteX = -3.5
 		if i > 300 and i < 700: #Right curve
-			lines[i].curve = 0.5
+			lines[i].curve = 1.9
 		if i > 800 and i < 1200: #Left curve
 			lines[i].curve = -0.7
-		if i > 750: #Cliffs
-			lines[i].y = sin(i / 30.0 - 25) * 1500
-		if i > 1200: #Right curve
-			lines[i].curve = 0.2
+		if i > 750 and i < 1200: #Cliffs
+#			lines[i].y = sin(i / 30.0 - 25) * 1500
+			lines[i].y = sin((i / 30.0) - 25) * 4500
+			last_y = lines[i].y
+#			print("last_y cliff = ", last_y)
+		if i >= 1200 and i : #Right curve
+			lines[i].y = ((-last_y/(track_size-1200)) * (i - 1200)) + last_y # f(x) = ax + b
+			print("lines[i].y = ", lines[i].y)
 
 	track_size = lines.size()
 	set_process(true)
 	pass
+
+#var num = 0
+#func logistic_function(x, a, b, c, d):
+#	var aux_x = track_size - x
+#	if num == 0:
+#		num = aux_x
+#	else:
+#		if aux_x < num/2:
+#			aux_x = -aux_x
+#
+##	print("conta = ", (1 + exp(-c * (x - d))) + b)
+##	print("exp = ", exp(-c * (x - d)))
+#	var result = float(a) / (1 + exp(-c * (aux_x - d))) + b
+#	print("result = ", result)
+#	return result
 
 func line(segment, cam_x, cam_y, cam_z):
 	if ((segment.z) - cam_z) != 0:
@@ -121,7 +141,7 @@ func _draw():
 	var track_curve = 0
 	var x = 0
 	var dx = 0
-	playerX -= lines[start_point].curve * speed/top_speed * step
+	playerX -= lines[start_point].curve * speed/ (top_speed/2) * step
 #	print("current curve = ", lines[start_point].curve)
 #	print("playerX = ", playerX)
 #	print("speed = ", speed)
@@ -152,7 +172,7 @@ func _draw():
 			road = Color(0.4, 0.4, 0.4)
 
 		if fmod((n/9), 2): 
-			divid_line = Color(0,0,0)
+			divid_line = Color(0,0,0,0)
 			grass = Color(0.2, 0.2, 0.2)
 		else:
 			divid_line = Color(1,1,1)
@@ -178,9 +198,9 @@ func _physics_process(delta):
 	speed = clamp(speed, 0, top_speed)
 	
 	if Input.is_action_pressed("ui_left"):
-		playerX -= speedX * step
+		playerX -= speedX * delta * 4
 	elif Input.is_action_pressed("ui_right"):
-		playerX += speedX * step
+		playerX += speedX * delta * 4
 		
 	update()
 	pass
