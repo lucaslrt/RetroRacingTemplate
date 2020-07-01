@@ -5,7 +5,7 @@ var screen_height = ProjectSettings.get_setting("display/window/size/height")#68
 
 var road_width = 2000
 var seg = 200
-var track_size = 2600 # Number of road segments
+var track_size = 0 # Number of road segments
 var render_seg_num = 300
 
 var speed = 200
@@ -28,6 +28,8 @@ var skln_height = 0
 var playerX = 0
 var speedX = .7
 
+var road_conf = []
+
 func _ready():
 	top_speed = float(seg) / step * 2
 	acceleration = float(top_speed) / 4
@@ -35,30 +37,45 @@ func _ready():
 	decel = float(-top_speed) / 5
 	cam = 1 / tan((field_of_view / 2) * PI / 180)
 	
-	# Drawing Road
-#	print("Criando pista...")
-	var last_y = 0
-	for i in range(track_size):# Quantity of horizontal lines on the road
+	road_conf = SceneSwitcher.get_param("road_conf")
+#	print("road_conf = ", road_conf)
+	
+	track_size = road_conf[road_conf.size() - 1].seg_size
+#	print("track_size = ", track_size)
+	var road_conf_index = 0
+	for i in range(track_size):
 		lines.push_back({x = 0, y = 0, z = 0, X = 0, Y = 0, W = 0, scale = 0, curve = 0, sprite = null, spriteX = 0, clip = 0.0})
 		lines[i].z = i * seg
-		if i != 0 and track_size % i == 0:
-			lines[i].sprite = Sprite.new()
-			lines[i].sprite.texture = load("res://icon.png")
-			lines[i].sprite.hide()
-			$YSort.add_child(lines[i].sprite)
-		lines[i].spriteX = -3.5
-		if i > 300 and i < 700: #Right curve
-			lines[i].curve = 1.9
-		if i > 800 and i < 1200: #Left curve
-			lines[i].curve = -0.7
-		if i > 750 and i < 1200: #Cliffs
-#			lines[i].y = sin(i / 30.0 - 25) * 1500
-			lines[i].y = sin((i / 30.0) - 25) * 4500
-			last_y = lines[i].y
-#			print("last_y cliff = ", last_y)
-		if i >= 1200 and i : #Right curve
-			lines[i].y = ((-last_y/(track_size-1200)) * (i - 1200)) + last_y # f(x) = ax + b
-			print("lines[i].y = ", lines[i].y)
+		if i > road_conf[road_conf_index].seg_size:
+			road_conf_index += 1
+		lines[i].curve = road_conf[road_conf_index].curve
+			
+		
+	
+	# Drawing Road
+#	print("Criando pista...")
+#	var last_y = 0
+#	for i in range(track_size):# Quantity of horizontal lines on the road
+#		lines.push_back({x = 0, y = 0, z = 0, X = 0, Y = 0, W = 0, scale = 0, curve = 0, sprite = null, spriteX = 0, clip = 0.0})
+#		lines[i].z = i * seg
+#		if i != 0 and track_size % i == 0:
+#			lines[i].sprite = Sprite.new()
+#			lines[i].sprite.texture = load("res://icon.png")
+#			lines[i].sprite.hide()
+#			$YSort.add_child(lines[i].sprite)
+#		lines[i].spriteX = -3.5
+#		if i > 300 and i < 700: #Right curve
+#			lines[i].curve = 0.9
+#		if i > 800 and i < 1200: #Left curve
+#			lines[i].curve = -0.7
+#		if i > 750 and i < 1200: #Cliffs
+##			lines[i].y = sin(i / 30.0 - 25) * 1500
+#			lines[i].y = sin((i / 30.0) - 25) * 4500
+#			last_y = lines[i].y
+##			print("last_y cliff = ", last_y)
+#		if i >= 1200 and i : #Right curve
+#			lines[i].y = ((-last_y/(track_size-1200)) * (i - 1200)) + last_y # f(x) = ax + b
+#			print("lines[i].y = ", lines[i].y)
 
 	track_size = lines.size()
 	set_process(true)
