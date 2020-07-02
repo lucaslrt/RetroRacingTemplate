@@ -37,8 +37,6 @@ func _draw_on_tilemap() -> void:
 		
 		if road_tile_pos.find(tile_point) == -1:
 			road_tile_pos.push_back(tile_point)
-#		print("cell_autotile_coord = ", $TileMap.get_cell_autotile_coord(tile_point.x,tile_point.y))
-#		print("road_tile_pos = ", road_tile_pos)
 		road_conf = _set_road_segment()
 	pass
 
@@ -73,30 +71,18 @@ func _set_road_segment() -> Dictionary:
 					direction = 2
 					
 		last_pos = road_tile_pos[i]
-		print("direction = ", direction)
+#		print("direction = ", direction)
 		match(autotile_coord):
-#			END_E:
-#				new_road_conf.push_back({curve = 0, seg_size = 100})
-#			END_W:
-#				new_road_conf.push_back({curve = 0, seg_size = 100})
-#			END_N:
-#				new_road_conf.push_back({curve = 0, seg_size = 100})
-#			END_S:
-#				new_road_conf.push_back({curve = 0, seg_size = 100})
 			ROAD_NW:
 				if direction == -1:
 					new_road_conf.push_back({curve = 0.9, seg_size = 100})
 				else:
 					new_road_conf.push_back({curve = -0.9, seg_size = 100})
-#			ROAD_NS:
-#				new_road_conf.push_back({curve = 0, seg_size = 100})
 			ROAD_NE:
 				if direction == 1:
 					new_road_conf.push_back({curve = 0.9, seg_size = 100})
 				else:
 					new_road_conf.push_back({curve = -0.9, seg_size = 100})
-#			ROAD_EW:
-#				new_road_conf.push_back({curve = 0, seg_size = 100})
 			ROAD_SW:
 				if direction == -2:
 					new_road_conf.push_back({curve = -0.9, seg_size = 100})
@@ -109,7 +95,7 @@ func _set_road_segment() -> Dictionary:
 					new_road_conf.push_back({curve = 0.9, seg_size = 100})
 			_:
 				new_road_conf.push_back({curve = 0, seg_size = 100})
-	print("\n\n")
+#	print("\n\n")
 	return new_road_conf
 
 func _on_Button_pressed() -> void:
@@ -118,5 +104,6 @@ func _on_Button_pressed() -> void:
 	for i in road_conf:
 		i.seg_size += track_size
 		track_size += i.seg_size - track_size
-	SceneSwitcher.change_scene("Scenes/Road.tscn", {"road_conf":road_conf})
+	print("road_tile_conf = ", road_tile_pos)
+	SceneSwitcher.change_scene("Scenes/World.tscn", {"road_conf":road_conf, "road_tile_conf":road_tile_pos})
 	pass # Replace with function body.
