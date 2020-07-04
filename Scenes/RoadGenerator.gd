@@ -20,6 +20,7 @@ var road_tile_pos = []
 
 
 func _process(delta: float) -> void:
+	$Camera2D.position = get_global_mouse_position()
 	if Input.is_action_pressed("draw"):
 		_draw_on_tilemap()
 	if Input.is_action_pressed("erase"):
