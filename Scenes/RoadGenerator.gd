@@ -18,13 +18,15 @@ var screen_height = ProjectSettings.get_setting("display/window/size/height")#68
 var road_conf = []
 var road_tile_pos = []
 
+var create_pressed = false
 
 func _process(delta: float) -> void:
-	$Camera2D.position = get_global_mouse_position()
-	if Input.is_action_pressed("draw"):
-		_draw_on_tilemap()
-	if Input.is_action_pressed("erase"):
-		_erase_tile()
+	if not create_pressed:
+		$Camera2D.position = get_global_mouse_position()
+		if Input.is_action_pressed("draw"):
+			_draw_on_tilemap()
+		if Input.is_action_pressed("erase"):
+			_erase_tile()
 	pass
 
 func _draw_on_tilemap() -> void:
@@ -101,10 +103,16 @@ func _set_road_segment() -> Dictionary:
 
 func _on_Button_pressed() -> void:
 	print("Button pressed")
+	create_pressed = true
 	var track_size = 0
 	for i in road_conf:
 		i.seg_size += track_size
 		track_size += i.seg_size - track_size
 	print("road_tile_conf = ", road_tile_pos)
 	SceneSwitcher.change_scene("Scenes/World.tscn", {"road_conf":road_conf, "road_tile_conf":road_tile_pos})
+	pass # Replace with function body.
+
+
+func _on_Button_button_down() -> void:
+	create_pressed = true
 	pass # Replace with function body.

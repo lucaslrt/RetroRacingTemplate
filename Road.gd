@@ -21,7 +21,7 @@ var grass
 var road
 var border
 var divid_line
-var pos = 0
+var pos = 0 setget set_pos, get_pos
 var skyline
 var skln_pos = 0
 var skln_height = 0
@@ -29,6 +29,13 @@ var playerX = 0
 var speedX = .7
 
 var road_conf = []
+
+func set_pos(value) -> void:
+	pos = value
+	pass
+
+func get_pos() -> int:
+	return pos
 
 func _ready():
 	top_speed = float(seg) / step * 2
