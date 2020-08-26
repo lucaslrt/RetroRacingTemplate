@@ -44,6 +44,11 @@ func _ready():
 	decel = float(-top_speed) / 5
 	cam = 1 / tan((field_of_view / 2) * PI / 180)
 	
+	_create_road()
+#	_mock_road()
+	pass
+
+func _create_road():
 	road_conf = SceneSwitcher.get_param("road_conf")
 #	print("road_conf = ", road_conf)
 	
@@ -56,52 +61,44 @@ func _ready():
 		if i > road_conf[road_conf_index].seg_size:
 			road_conf_index += 1
 		lines[i].curve = road_conf[road_conf_index].curve
-			
-		
-	
+	pass
+
+func _mock_road():
 	# Drawing Road
-#	print("Criando pista...")
-#	var last_y = 0
-#	for i in range(track_size):# Quantity of horizontal lines on the road
-#		lines.push_back({x = 0, y = 0, z = 0, X = 0, Y = 0, W = 0, scale = 0, curve = 0, sprite = null, spriteX = 0, clip = 0.0})
-#		lines[i].z = i * seg
-#		if i != 0 and track_size % i == 0:
-#			lines[i].sprite = Sprite.new()
-#			lines[i].sprite.texture = load("res://icon.png")
-#			lines[i].sprite.hide()
-#			$YSort.add_child(lines[i].sprite)
-#		lines[i].spriteX = -3.5
-#		if i > 300 and i < 700: #Right curve
-#			lines[i].curve = 0.9
-#		if i > 800 and i < 1200: #Left curve
-#			lines[i].curve = -0.7
-#		if i > 750 and i < 1200: #Cliffs
-##			lines[i].y = sin(i / 30.0 - 25) * 1500
-#			lines[i].y = sin((i / 30.0) - 25) * 4500
-#			last_y = lines[i].y
-##			print("last_y cliff = ", last_y)
-#		if i >= 1200 and i : #Right curve
+	track_size = 2600
+	print("Criando pista...")
+	var last_y = 0
+	var x = -((2600 - 1200)/2)
+	for i in range(track_size):# Quantity of horizontal lines on the road
+		lines.push_back({x = 0, y = 0, z = 0, X = 0, Y = 0, W = 0, scale = 0, curve = 0, sprite = null, spriteX = 0, clip = 0.0})
+		lines[i].z = i * seg
+		if i != 0 and track_size % i == 0:
+			lines[i].sprite = Sprite.new()
+			lines[i].sprite.texture = load("res://icon.png")
+			lines[i].sprite.hide()
+			$YSort.add_child(lines[i].sprite)
+		lines[i].spriteX = -3.5
+		if i > 300 and i < 700: #Right curve
+			lines[i].curve = 0.9
+		if i > 800 and i < 1200: #Left curve
+			lines[i].curve = -0.7
+		if i > 750 and i < 1200: #Cliffs
+#			lines[i].y = sin(i / 30.0 - 25) * 1500
+			lines[i].y = sin((i / 30.0) - 25) * 4500
+			last_y = lines[i].y
+#			print("last_y cliff = ", last_y)
+		if i >= 1200 and i : #Right curve
 #			lines[i].y = ((-last_y/(track_size-1200)) * (i - 1200)) + last_y # f(x) = ax + b
-#			print("lines[i].y = ", lines[i].y)
+			lines[i].y = _sigmoid(x,-last_y,0,0.009,last_y) 
+			x += 1
+			print("lines[i].y = ", lines[i].y)
 
 	track_size = lines.size()
 	set_process(true)
 	pass
 
-#var num = 0
-#func logistic_function(x, a, b, c, d):
-#	var aux_x = track_size - x
-#	if num == 0:
-#		num = aux_x
-#	else:
-#		if aux_x < num/2:
-#			aux_x = -aux_x
-#
-##	print("conta = ", (1 + exp(-c * (x - d))) + b)
-##	print("exp = ", exp(-c * (x - d)))
-#	var result = float(a) / (1 + exp(-c * (aux_x - d))) + b
-#	print("result = ", result)
-#	return result
+func _sigmoid(x,a,b,c,d):
+	return a/(1 + exp(c*(-x + b))) + d
 
 func line(segment, cam_x, cam_y, cam_z):
 	if ((segment.z) - cam_z) != 0:

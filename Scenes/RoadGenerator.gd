@@ -33,24 +33,47 @@ func _draw_on_tilemap() -> void:
 	var point = get_local_mouse_position()
 #	print("desenhando tile na posição ", point)
 	var tile_point = $TileMap.world_to_map(point)
-#	print("tile_point = ", tile_point)
-	if ![Vector2(12,0), Vector2(12,1), Vector2(13,0), Vector2(13,1)].has(tile_point): #Local onde o button está
+	print("tile_point = ", tile_point)
+	
+#	if ![Vector2(12,0), Vector2(12,1), Vector2(13,0), Vector2(13,1)].has(tile_point): #Local onde o button está
+	
+	if road_tile_pos.empty(): # Caso não tenha estrada ainda colocada, o player pode adiciona-la em qualquer lugar
+		print("Mapa Vazio")
 		$TileMap.set_cellv(tile_point,0)
 		$TileMap.update_bitmask_area(tile_point)
 		
 		if road_tile_pos.find(tile_point) == -1:
 			road_tile_pos.push_back(tile_point)
+			
 		road_conf = _set_road_segment()
+	else:
+		var last_tile = road_tile_pos.back()
+		print("last_tile = ", last_tile)
+		var possible_points = [Vector2(last_tile.x + 1, last_tile.y), 
+							Vector2(last_tile.x - 1, last_tile.y), 
+							Vector2(last_tile.x,last_tile.y + 1), 
+							Vector2(last_tile.x, last_tile.y - 1)]
+		print("possible_points = ", possible_points)
+		if possible_points.find(tile_point) != -1 and road_tile_pos.find(tile_point) == -1:
+			$TileMap.set_cellv(tile_point,0)
+			$TileMap.update_bitmask_area(tile_point)
+			road_tile_pos.push_back(tile_point)
+			print("road_tile_pos = ", road_tile_pos)
+			road_conf = _set_road_segment()
+		
 	pass
 
 func _erase_tile() -> void:
 	var point = get_local_mouse_position()
-#	print("desenhando tile na posição ", point)
 	var tile_point = $TileMap.world_to_map(point)
-	$TileMap.set_cellv(tile_point,-1)
-	$TileMap.update_bitmask_area(tile_point)
-	road_conf = _set_road_segment()
-	road_tile_pos.erase(tile_point)
+	print("Apagando tile na posição ", tile_point)
+	print("road_tile_pos = ", road_tile_pos.back())
+	if road_tile_pos.back() == tile_point:
+		print("Apagando tile...")
+		$TileMap.set_cellv(tile_point,-1)
+		$TileMap.update_bitmask_area(tile_point)
+		road_conf = _set_road_segment()
+		road_tile_pos.erase(tile_point)
 	pass
 
 func _set_road_segment() -> Dictionary:

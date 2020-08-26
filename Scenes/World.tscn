@@ -17,6 +17,7 @@ script = ExtResource( 3 )
 [node name="Minimap" type="CanvasLayer" parent="."]
 
 [node name="TileMap" type="TileMap" parent="Minimap"]
+position = Vector2( 80, 60 )
 scale = Vector2( 0.25, 0.25 )
 mode = 1
 tile_set = ExtResource( 1 )
@@ -24,6 +25,7 @@ cell_size = Vector2( 100, 50 )
 format = 1
 script = ExtResource( 4 )
 
-[node name="Node2D" type="Node2D" parent="Minimap"]
+[node name="PlayerPoint" type="Node2D" parent="Minimap"]
+position = Vector2( 80, 60 )
 scale = Vector2( 0.25, 0.25 )
 script = ExtResource( 5 )
