@@ -20,6 +20,8 @@ var road_tile_pos = []
 
 var create_pressed = false
 
+var tile_selector = Vector2(0,0)
+
 func _process(delta: float) -> void:
 	if not create_pressed:
 		$Camera2D.position = get_global_mouse_position()
@@ -29,11 +31,19 @@ func _process(delta: float) -> void:
 			_erase_tile()
 	pass
 
+func _mark_tile(tile_point: Vector2) -> void:
+	$Selector.position = $TileMap.map_to_world(tile_point)
+	$Selector.position.y += 25
+	pass
+
 func _draw_on_tilemap() -> void:
 	var point = get_local_mouse_position()
 #	print("desenhando tile na posição ", point)
 	var tile_point = $TileMap.world_to_map(point)
 	print("tile_point = ", tile_point)
+	if road_tile_pos.find(tile_point) == 1:
+		_mark_tile(tile_point)
+		return
 	
 #	if ![Vector2(12,0), Vector2(12,1), Vector2(13,0), Vector2(13,1)].has(tile_point): #Local onde o button está
 	
@@ -44,6 +54,8 @@ func _draw_on_tilemap() -> void:
 		
 		if road_tile_pos.find(tile_point) == -1:
 			road_tile_pos.push_back(tile_point)
+			$Selector.show()
+			_mark_tile(tile_point)
 			
 		road_conf = _set_road_segment()
 	else:
@@ -54,13 +66,16 @@ func _draw_on_tilemap() -> void:
 							Vector2(last_tile.x,last_tile.y + 1), 
 							Vector2(last_tile.x, last_tile.y - 1)]
 		print("possible_points = ", possible_points)
-		if possible_points.find(tile_point) != -1 and road_tile_pos.find(tile_point) == -1:
+		
+		
+		if possible_points.find(tile_point) != -1:
+#			$TileMap.tile_set.tile_set_material($TileMap.get_cellv(last_tile), null)
+			_mark_tile(tile_point)
 			$TileMap.set_cellv(tile_point,0)
 			$TileMap.update_bitmask_area(tile_point)
 			road_tile_pos.push_back(tile_point)
 			print("road_tile_pos = ", road_tile_pos)
 			road_conf = _set_road_segment()
-		
 	pass
 
 func _erase_tile() -> void:
@@ -74,6 +89,7 @@ func _erase_tile() -> void:
 		$TileMap.update_bitmask_area(tile_point)
 		road_conf = _set_road_segment()
 		road_tile_pos.erase(tile_point)
+		_mark_tile(road_tile_pos.back())
 	pass
 
 func _set_road_segment() -> Dictionary:
@@ -135,7 +151,10 @@ func _on_Button_pressed() -> void:
 	SceneSwitcher.change_scene("Scenes/World.tscn", {"road_conf":road_conf, "road_tile_conf":road_tile_pos})
 	pass # Replace with function body.
 
-
 func _on_Button_button_down() -> void:
 	create_pressed = true
 	pass # Replace with function body.
+
+func _draw() -> void:
+	
+	pass
