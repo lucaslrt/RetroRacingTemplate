@@ -31,50 +31,51 @@ func _process(delta: float) -> void:
 			_erase_tile()
 	pass
 
-func _mark_tile(tile_point: Vector2) -> void:
-	$Selector.position = $TileMap.map_to_world(tile_point)
-	$Selector.position.y += 25
+func _mark_tile(tile_point) -> void:
+	if tile_point != null:
+		$Selector.show()
+		$Selector.position = $TileMap.map_to_world(tile_point)
+		$Selector.position.y += 25
+	else:
+		$Selector.hide()
 	pass
 
 func _draw_on_tilemap() -> void:
 	var point = get_local_mouse_position()
 #	print("desenhando tile na posição ", point)
 	var tile_point = $TileMap.world_to_map(point)
-	print("tile_point = ", tile_point)
-	if road_tile_pos.find(tile_point) == 1:
+#	print("tile_point = ", tile_point)
+	if road_tile_pos.has(tile_point):
 		_mark_tile(tile_point)
 		return
 	
 #	if ![Vector2(12,0), Vector2(12,1), Vector2(13,0), Vector2(13,1)].has(tile_point): #Local onde o button está
 	
 	if road_tile_pos.empty(): # Caso não tenha estrada ainda colocada, o player pode adiciona-la em qualquer lugar
-		print("Mapa Vazio")
+#		print("Mapa Vazio")
 		$TileMap.set_cellv(tile_point,0)
 		$TileMap.update_bitmask_area(tile_point)
-		
-		if road_tile_pos.find(tile_point) == -1:
-			road_tile_pos.push_back(tile_point)
-			$Selector.show()
-			_mark_tile(tile_point)
-			
+		road_tile_pos.push_back(tile_point)
+#		$Selector.show()
+		_mark_tile(tile_point)
 		road_conf = _set_road_segment()
 	else:
 		var last_tile = road_tile_pos.back()
-		print("last_tile = ", last_tile)
+#		print("last_tile = ", last_tile)
 		var possible_points = [Vector2(last_tile.x + 1, last_tile.y), 
 							Vector2(last_tile.x - 1, last_tile.y), 
 							Vector2(last_tile.x,last_tile.y + 1), 
 							Vector2(last_tile.x, last_tile.y - 1)]
-		print("possible_points = ", possible_points)
+#		print("possible_points = ", possible_points)
 		
 		
-		if possible_points.find(tile_point) != -1:
+		if possible_points.has(tile_point):
 #			$TileMap.tile_set.tile_set_material($TileMap.get_cellv(last_tile), null)
 			_mark_tile(tile_point)
 			$TileMap.set_cellv(tile_point,0)
 			$TileMap.update_bitmask_area(tile_point)
 			road_tile_pos.push_back(tile_point)
-			print("road_tile_pos = ", road_tile_pos)
+#			print("road_tile_pos = ", road_tile_pos)
 			road_conf = _set_road_segment()
 	pass
 
@@ -90,6 +91,7 @@ func _erase_tile() -> void:
 		road_conf = _set_road_segment()
 		road_tile_pos.erase(tile_point)
 		_mark_tile(road_tile_pos.back())
+	
 	pass
 
 func _set_road_segment() -> Dictionary:
