@@ -35,6 +35,10 @@ __meta__ = {
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
+limit_left = -10
+limit_top = -10
+limit_right = 10000
+limit_bottom = 10000
 drag_margin_h_enabled = true
 drag_margin_v_enabled = true
 smoothing_enabled = true

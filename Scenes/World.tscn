@@ -16,8 +16,21 @@ script = ExtResource( 3 )
 
 [node name="Minimap" type="CanvasLayer" parent="."]
 
-[node name="TileMap" type="TileMap" parent="Minimap"]
-position = Vector2( 80, 60 )
+[node name="ColorRect" type="ColorRect" parent="Minimap"]
+anchor_left = 0.006
+anchor_top = 0.01
+anchor_right = 0.282
+anchor_bottom = 0.383
+margin_left = -0.0942421
+margin_top = 0.145758
+margin_right = 0.265747
+margin_bottom = -0.134247
+color = Color( 1, 1, 1, 0 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TileMap" type="TileMap" parent="Minimap/ColorRect"]
 scale = Vector2( 0.25, 0.25 )
 mode = 1
 tile_set = ExtResource( 1 )
@@ -25,7 +38,6 @@ cell_size = Vector2( 100, 50 )
 format = 1
 script = ExtResource( 4 )
 
-[node name="PlayerPoint" type="Node2D" parent="Minimap"]
-position = Vector2( 80, 60 )
+[node name="PlayerPoint" type="Node2D" parent="Minimap/ColorRect"]
 scale = Vector2( 0.25, 0.25 )
 script = ExtResource( 5 )

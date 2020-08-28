@@ -19,12 +19,13 @@ var road_conf = []
 var road_tile_pos = []
 
 var create_pressed = false
-
-var tile_selector = Vector2(0,0)
+var map_min_coord = Vector2(0,0)
+var map_max_coord = Vector2(0,0)
 
 func _process(delta: float) -> void:
 	if not create_pressed:
-		$Camera2D.position = get_global_mouse_position()
+		if $Camera2D.position > Vector2(-1, -1):
+			$Camera2D.position = get_global_mouse_position()
 		if Input.is_action_pressed("draw"):
 			_draw_on_tilemap()
 		if Input.is_action_pressed("erase"):
@@ -49,8 +50,6 @@ func _draw_on_tilemap() -> void:
 		_mark_tile(tile_point)
 		return
 	
-#	if ![Vector2(12,0), Vector2(12,1), Vector2(13,0), Vector2(13,1)].has(tile_point): #Local onde o button está
-	
 	if road_tile_pos.empty(): # Caso não tenha estrada ainda colocada, o player pode adiciona-la em qualquer lugar
 #		print("Mapa Vazio")
 		$TileMap.set_cellv(tile_point,0)
@@ -61,16 +60,14 @@ func _draw_on_tilemap() -> void:
 		road_conf = _set_road_segment()
 	else:
 		var last_tile = road_tile_pos.back()
-#		print("last_tile = ", last_tile)
 		var possible_points = [Vector2(last_tile.x + 1, last_tile.y), 
 							Vector2(last_tile.x - 1, last_tile.y), 
 							Vector2(last_tile.x,last_tile.y + 1), 
 							Vector2(last_tile.x, last_tile.y - 1)]
+#		print("last_tile = ", last_tile)
 #		print("possible_points = ", possible_points)
 		
-		
 		if possible_points.has(tile_point):
-#			$TileMap.tile_set.tile_set_material($TileMap.get_cellv(last_tile), null)
 			_mark_tile(tile_point)
 			$TileMap.set_cellv(tile_point,0)
 			$TileMap.update_bitmask_area(tile_point)
