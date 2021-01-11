@@ -77,12 +77,14 @@ func _mock_road():
 #			curve = 0, sprite = null, spriteX = 0, clip = 0.0})
 		lines.push_back(RoadSegment.new())
 		lines[i].pos_z = i * acceleration_view
-#		if i != 0 and track_size % i == 0:
-#			lines[i].sprite = Sprite.new()
-#			lines[i].sprite.texture = load("res://icon.png")
-#			lines[i].sprite.hide()
-#			$YSort.add_child(lines[i].sprite)
-#		lines[i].spriteX = -3.5
+		if i != 0 and track_size % i == 0:
+			var new_sprite = Sprite.new()
+			new_sprite.texture = load("res://icon.png")
+			new_sprite.hide()
+			var sprite_position_x = -3.5
+			lines[i].sprite_decorations.push_back({sprite = new_sprite, 
+				pos_x = sprite_position_x, pos_y = 0})
+			$YSort.add_child(lines[i].sprite_decorations[0].sprite)
 		if i > 300 and i < 700: #Right curve
 			lines[i].curve_degrees = 0.9
 		if i > 800 and i < 1200: #Left curve
@@ -124,31 +126,31 @@ func drawRoad(col, x1, y1, w1, x2, y2, w2):
 	pass
 
 func _draw_sprite(line):
-	#TODO: Fazer uma adapção na classe RoadSegment pra suportar sprites
-#	if line.sprite != null:
-#		var w = 64
-#		var h = 64
-#
-#		var destX = line.X + line.scale * line.spriteX * screen_width/2
-#		var destY = line.Y + 4
-#		var destW = 64 * line.W / 266
-#		var destH = 64 * line.W / 266
-#
-#		destX += destW * line.spriteX
-#		destY += destH * (-1)
-#
-#		var clipH = destY + destH - line.clip
-#		if clipH < 0:
-#			clipH = 0
-#
-#		if clipH >= destH:
-#			line.sprite.hide()
-#			return
-#
-#		#Setar as configurações de sprite aqui
-#		line.sprite.scale = Vector2(destW/w, destH/h)
-#		line.sprite.position = Vector2(destX, destY)
-#		line.sprite.show()
+	if !line.sprite_decorations.empty():
+		var w = 64
+		var h = 64
+
+		var destX = line.x_3d + line.scale * line.sprite_decorations[0].pos_x * screen_width/2
+		var destY = line.y_3d + 4
+		var destW = 64 * line.width_3d / 266
+		var destH = 64 * line.width_3d / 266
+
+		destX += destW * line.sprite_decorations[0].pos_x
+		destY += destH * (-1)
+
+		var clipH = destY + destH - line.clip
+		if clipH < 0:
+			clipH = 0
+
+		if clipH >= destH:
+			line.sprite_decorations[0].sprite.hide()
+			return
+
+		#Setar as configurações de sprite aqui
+		line.sprite_decorations[0].sprite.scale = Vector2(destW/w, destH/h)
+		line.sprite_decorations[0].sprite.position = Vector2(destX, destY)
+		line.sprite_decorations[0].sprite.show()
+		print("Sprite aparece.")
 	pass
 
 func _draw():
