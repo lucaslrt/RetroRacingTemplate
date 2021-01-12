@@ -16,7 +16,7 @@ func _draw() -> void:
 	player_pos = get_node("/root/World/Road").pos
 	if road_conf != null:
 		for i in range(road_conf.size()):
-			if player_pos < road_conf[i].seg_size * 200:
+			if player_pos < road_conf[i].size * 200:
 				var tilemap = get_parent().get_node("TileMap")
 				var point_pos = Vector2(tilemap.minimap_conf[i].x, tilemap.minimap_conf[i].y)
 				draw_circle(tilemap.map_to_world(point_pos), 10, player_color)

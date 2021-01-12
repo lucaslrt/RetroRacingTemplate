@@ -17,7 +17,7 @@ var acceleration
 var breaking
 var decel
 var field_of_view = 100.0
-var cam_zoom = 1000 #Profundidade da câmera
+var cam_zoom = 1000
 var lines = []
 var grass
 var road
@@ -44,26 +44,25 @@ func _ready():
 	acceleration = float(top_speed) / 4
 	breaking = -top_speed
 	decel = float(-top_speed) / 5
-	cam_zoom = 1 / tan((field_of_view / 2) * PI / 180)
+	cam_zoom = 1 / tan((field_of_view / 2) * PI / 180) #TODO: melhorar essa conta aqui
 	
-#	_create_road()
-	_mock_road()
+	_create_road()
+#	_mock_road()
 	pass
 
 func _create_road():
-	road_conf = SceneSwitcher.get_param("road_conf")
-#	print("road_conf = ", road_conf)
-	
-	track_size = road_conf[road_conf.size() - 1].seg_size
+	road_conf = SceneSwitcher.get_param("road_conf") # Parâmetros para construção da pista
+	track_size = road_conf[road_conf.size() - 1].size
 #	print("track_size = ", track_size)
 	var road_conf_index = 0
-	for i in range(track_size):
-		lines.push_back({x = 0, y = 0, z = 0, X = 0, Y = 0, W = 0, scale = 0, 
-			curve = 0, sprite = null, spriteX = 0, clip = 0.0})
-		lines[i].z = i * acceleration_view
-		if i > road_conf[road_conf_index].seg_size:
+	for i in range(track_size): # Construindo a pista de fato
+		lines.push_back(RoadSegment.new())
+		lines[i].pos_z = i * acceleration_view
+		if i > road_conf[road_conf_index].size:
 			road_conf_index += 1
-		lines[i].curve = road_conf[road_conf_index].curve
+
+		 # Setando parâmetros para o trecho específico
+		lines[i].curve_degrees = road_conf[road_conf_index].curve_degrees
 	pass
 
 func _mock_road():
@@ -73,8 +72,6 @@ func _mock_road():
 	var last_y = 0
 	var x = -((2600 - 1200)/2)
 	for i in range(track_size):# Quantity of horizontal lines on the road
-#		lines.push_back({x = 0, y = 0, z = 0, X = 0, Y = 0, W = 0, scale = 0, 
-#			curve = 0, sprite = null, spriteX = 0, clip = 0.0})
 		lines.push_back(RoadSegment.new())
 		lines[i].pos_z = i * acceleration_view
 		if i != 0 and track_size % i == 0:
@@ -116,7 +113,6 @@ func line(segment, cam_x, cam_y, cam_z):
 	segment.width_3d = segment.scale * road_width * (screen_width / 2)
 	return segment
 
-
 func drawRoad(col, x1, y1, w1, x2, y2, w2):
 	var point = [Vector2(int(x1-w1), int(y1)), Vector2(int(x2-w2), int(y2)),
 	Vector2(int(x2+w2), int(y2)), Vector2(int(x1+w1), int(y1))]
@@ -150,26 +146,16 @@ func _draw_sprite(line):
 		line.sprite_decorations[0].sprite.scale = Vector2(destW/w, destH/h)
 		line.sprite_decorations[0].sprite.position = Vector2(destX, destY)
 		line.sprite_decorations[0].sprite.show()
-		print("Sprite aparece.")
 	pass
 
 func _draw():
 	var result = pos + (speed * step) # Cálculo da posição levando em conta a velocidade
 
-	#if result == 20000:#320000:
-	#	result = 0
-	print("result = ", result)
 	var n_max = track_size * acceleration_view
 	
 	if(result >= n_max):
 		result -= n_max
-#	while result >= n_max:
-#		result -= n_max
-#
-#	while result < 0:
-#		result += n_max
 
-	print("result depois das contas = ", result)
 	pos = round(result)
 
 	var start_point = (float(pos) / acceleration_view) - 1
@@ -188,10 +174,12 @@ func _draw():
 		if n >= track_size:
 			num_pos = track_size * acceleration_view
 
-		var l = line(lines[fmod(n, track_size)], 
+		var indexL = fmod(n, track_size)
+		var l = line(lines[indexL],
 			(playerX * road_width) - x, cam_h, pos - num_pos)
 
-		var p = lines[fmod((n-1), track_size)]
+		var indexP = fmod((n-1), track_size)
+		var p = lines[indexP]
 
 		x += dx
 		dx += l.curve_degrees
@@ -223,7 +211,8 @@ func _draw():
 		drawRoad(divid_line, p.x_3d, p.y_3d, p.width_3d * 0.01, l.x_3d, l.y_3d, l.width_3d * 0.01)
 
 	for n in range(start_point + render_seg_num, start_point, -1):
-		_draw_sprite(lines[fmod(n, track_size)])
+		var index = fmod(n, track_size)
+		_draw_sprite(lines[index])
 	pass
 
 func _physics_process(delta):
@@ -241,5 +230,5 @@ func _physics_process(delta):
 	elif Input.is_action_pressed("ui_right"):
 		playerX += speedX * delta * 4
 
-	update()
+	update() # Update _draw()
 	pass

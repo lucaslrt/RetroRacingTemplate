@@ -1,5 +1,7 @@
 extends Node2D
 
+const RoadSegment = preload("res://Scenes/RoadSegment.gd")  
+
 const END_E = Vector2(1,0)
 const END_W = Vector2(0,1)
 const END_N = Vector2(2,0)
@@ -116,26 +118,48 @@ func _set_road_segment() -> Dictionary:
 		match(autotile_coord):
 			ROAD_NW:
 				if direction == -1:
-					new_road_conf.push_back({curve = 0.9, seg_size = 100})
+					new_road_conf.push_back(RoadSegment.new(100, 0.9))
 				else:
-					new_road_conf.push_back({curve = -0.9, seg_size = 100})
+					new_road_conf.push_back(RoadSegment.new(100, -0.9))
 			ROAD_NE:
 				if direction == 1:
-					new_road_conf.push_back({curve = 0.9, seg_size = 100})
+					new_road_conf.push_back(RoadSegment.new(100, 0.9))
 				else:
-					new_road_conf.push_back({curve = -0.9, seg_size = 100})
+					new_road_conf.push_back(RoadSegment.new(100, -0.9))
 			ROAD_SW:
 				if direction == -2:
-					new_road_conf.push_back({curve = -0.9, seg_size = 100})
+					new_road_conf.push_back(RoadSegment.new(100, -0.9))
 				else:
-					new_road_conf.push_back({curve = 0.9, seg_size = 100})
+					new_road_conf.push_back(RoadSegment.new(100, 0.9))
 			ROAD_ES:
 				if direction == 1:
-					new_road_conf.push_back({curve = -0.9, seg_size = 100})
+					new_road_conf.push_back(RoadSegment.new(100, -0.9))
 				else:
-					new_road_conf.push_back({curve = 0.9, seg_size = 100})
+					new_road_conf.push_back(RoadSegment.new(100, 0.9))
 			_:
-				new_road_conf.push_back({curve = 0, seg_size = 100})
+				new_road_conf.push_back(RoadSegment.new(100))
+#			ROAD_NW:
+#				if direction == -1:
+#					new_road_conf.push_back({curve = 0.9, seg_size = 100})
+#				else:
+#					new_road_conf.push_back({curve = -0.9, seg_size = 100})
+#			ROAD_NE:
+#				if direction == 1:
+#					new_road_conf.push_back({curve = 0.9, seg_size = 100})
+#				else:
+#					new_road_conf.push_back({curve = -0.9, seg_size = 100})
+#			ROAD_SW:
+#				if direction == -2:
+#					new_road_conf.push_back({curve = -0.9, seg_size = 100})
+#				else:
+#					new_road_conf.push_back({curve = 0.9, seg_size = 100})
+#			ROAD_ES:
+#				if direction == 1:
+#					new_road_conf.push_back({curve = -0.9, seg_size = 100})
+#				else:
+#					new_road_conf.push_back({curve = 0.9, seg_size = 100})
+#			_:
+#				new_road_conf.push_back({curve = 0, seg_size = 100})
 #	print("\n\n")
 	return new_road_conf
 
@@ -144,8 +168,8 @@ func _on_Button_pressed() -> void:
 	create_pressed = true
 	var track_size = 0
 	for i in road_conf:
-		i.seg_size += track_size
-		track_size += i.seg_size - track_size
+		i.size += track_size
+		track_size += i.size - track_size
 	print("road_tile_conf = ", road_tile_pos)
 	SceneSwitcher.change_scene("Scenes/World.tscn", {"road_conf":road_conf, "road_tile_conf":road_tile_pos})
 	pass # Replace with function body.
