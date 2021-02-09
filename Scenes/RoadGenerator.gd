@@ -26,8 +26,8 @@ var map_max_coord = Vector2(0,0)
 
 func _process(delta: float) -> void:
 	if not create_pressed:
-		if $Camera2D.position > Vector2(-1, -1):
-			$Camera2D.position = get_global_mouse_position()
+		$CameraEditor.position = get_global_mouse_position()
+		$CameraEditor.update()
 		if Input.is_action_pressed("draw"):
 			_draw_on_tilemap()
 		if Input.is_action_pressed("erase"):
@@ -57,7 +57,6 @@ func _draw_on_tilemap() -> void:
 		$TileMap.set_cellv(tile_point,0)
 		$TileMap.update_bitmask_area(tile_point)
 		road_tile_pos.push_back(tile_point)
-#		$Selector.show()
 		_mark_tile(tile_point)
 		road_conf = _set_road_segment()
 	else:
@@ -81,10 +80,10 @@ func _draw_on_tilemap() -> void:
 func _erase_tile() -> void:
 	var point = get_local_mouse_position()
 	var tile_point = $TileMap.world_to_map(point)
-	print("Apagando tile na posição ", tile_point)
-	print("road_tile_pos = ", road_tile_pos.back())
+#	print("Apagando tile na posição ", tile_point)
+#	print("road_tile_pos = ", road_tile_pos.back())
 	if road_tile_pos.back() == tile_point:
-		print("Apagando tile...")
+#		print("Apagando tile...")
 		$TileMap.set_cellv(tile_point,-1)
 		$TileMap.update_bitmask_area(tile_point)
 		road_conf = _set_road_segment()
@@ -138,46 +137,19 @@ func _set_road_segment() -> Dictionary:
 					new_road_conf.push_back(RoadSegment.new(100, 0.9))
 			_:
 				new_road_conf.push_back(RoadSegment.new(100))
-#			ROAD_NW:
-#				if direction == -1:
-#					new_road_conf.push_back({curve = 0.9, seg_size = 100})
-#				else:
-#					new_road_conf.push_back({curve = -0.9, seg_size = 100})
-#			ROAD_NE:
-#				if direction == 1:
-#					new_road_conf.push_back({curve = 0.9, seg_size = 100})
-#				else:
-#					new_road_conf.push_back({curve = -0.9, seg_size = 100})
-#			ROAD_SW:
-#				if direction == -2:
-#					new_road_conf.push_back({curve = -0.9, seg_size = 100})
-#				else:
-#					new_road_conf.push_back({curve = 0.9, seg_size = 100})
-#			ROAD_ES:
-#				if direction == 1:
-#					new_road_conf.push_back({curve = -0.9, seg_size = 100})
-#				else:
-#					new_road_conf.push_back({curve = 0.9, seg_size = 100})
-#			_:
-#				new_road_conf.push_back({curve = 0, seg_size = 100})
 #	print("\n\n")
 	return new_road_conf
 
 func _on_Button_pressed() -> void:
-	print("Button pressed")
 	create_pressed = true
 	var track_size = 0
 	for i in road_conf:
 		i.size += track_size
 		track_size += i.size - track_size
-	print("road_tile_conf = ", road_tile_pos)
+#	print("road_tile_conf = ", road_tile_pos)
 	SceneSwitcher.change_scene("Scenes/World.tscn", {"road_conf":road_conf, "road_tile_conf":road_tile_pos})
-	pass # Replace with function body.
+	pass
 
 func _on_Button_button_down() -> void:
 	create_pressed = true
-	pass # Replace with function body.
-
-func _draw() -> void:
-	
 	pass
